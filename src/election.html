@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Election System</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="container" style="width: 650px;">
+        <div class="row">
+            <div class="col-lg-12 ">
+                <h1 class="text-center">Election System</h1>
+                <hr/>
+                <br/>
+            </div>
+            <div id="loader">
+                <p class="text-center"> Loading...</p>   
+            </div>
+        </div>
+        <div id= "content1" class="row" style="display:none">
+                    
+            <div id="candidateTemplate" style="display:none">
+                <div class="col-sm-6 col-lg-4">
+                    <div class="panel panel-default panel-vote">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"> Voting</h3>
+                        </div>
+                        <div class="panel-body">
+                            <img alt="140*140" data-src="holder.js" class="img-rounded img-center" style="width:100%;" src="" data-holder-rendered="true">
+                            <br/><br/>
+                            <strong> Name</strong>: <span class="candidate-name"> Akindipe Olusegun</span><br/>
+                            <strong> Age</strong>: <span class="candidate-age"> 43</span><br/>
+                            <strong> Post</strong>: <span class="candidate-post"> President</span><br/>
+                            <button class="btn btn-default btn-adopt" type="button" id="myModal1" data-id="0"> Vote</button>
+                            
+                        </div>
+                    </div>
+                </div>      
+            </div>
+            <p id="accountAddress" class="text-center"></p>
+            <div style="display: none">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Names</th>
+                            <th scope="col">Votes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="candidatesResults"></tbody>
+                </table>
+            </div>
+            <!-- Modal-->
+            <div class="modal fade" id="myModal1" role="dialog">
+                <div class="modal-dialog">
+                <!--Modal Content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title"> Candidate Name</h4>
+                    </div>
+                    <div class="modal-body">
+                        <span> You have chosen Candidate A </span> <img src="images/fergie.jpg" style="width:100px; height:100px">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Vote  </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close  </button>
+                    </div>
+                    </div>
+                </div>  
+            </div>
+
+            <!--SECOND MODAL-->
+            <div class="modal fade" id="myModal2" role="dialog">
+                <div class="modal-dialog">
+                <!--Modal Content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title"> Candidate Name</h4>
+                    </div>
+                    <div class="modal-body">
+                        <span> You have chosen Candidate A </span> <img src="images/fergie.jpg" style="width:100px; height:100px">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="madal">Vote  </button>
+                        <button type="button" class="btn btn-default" data-dismiss="madal">Close  </button>
+                    </div>
+                    </div>  
+                </div>    
+            </div> 
+        </div>
+               
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/web3.min.js"></script>
+    <script src="js/truffle-contract.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
