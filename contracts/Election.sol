@@ -6,7 +6,7 @@ contract Election {
      function Election () public {     
         addCandidate("candidate 1");
         addCandidate("candidate 2");
-        auctionEnd = now + (durationMins + 1 minutes);
+        //auctionEnd = now + (durationMins + 1 minutes);
 
     }
 
@@ -15,7 +15,7 @@ contract Election {
 
     uint public candidatesCount;
     uint public auctionEnd;
-    uint durationMins= 60;    
+    //uint durationMins= 60;    
    
     
     struct Candidate {
@@ -38,10 +38,10 @@ contract Election {
     
 
     function vote (uint _candidateId) public {
-        //require (!voters[msg.sender]).voted; //require that the voter has not voted
+        require(!voters[msg.sender]); //require that the voter has not voted
         //require (!voters[msg.sender]).authorized; //require that the voter has not been authorized
 
-        require (_candidateId > 0 && _candidateId <= candidatesCount);
+        require(_candidateId > 0 && _candidateId <= candidatesCount);
 
         voters[msg.sender] = true;
 

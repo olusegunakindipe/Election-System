@@ -1,102 +1,138 @@
-App = {
+
+ 
+ App = {
   web3Provider: null,
   contracts: {},
-
-  init: async function() {
+  account: '0x0',
+  
+  init: async () =>{
     // Load candidates.
     $.getJSON('../candidates.json', function(data) {
-      var content1 = $('#content1');
-      var candidateTemplate = $('#candidateTemplate');
+      let content = $('#content');
+      let content2 = $('#content2');
+     //var myModal= $('#myModal');
 
       for (i = 0; i < data.length; i ++) {
-        candidateTemplate.find('.panel-title').text(data[i].name);
-        candidateTemplate.find('img').attr('src', data[i].picture);
-        
-        candidateTemplate.find('.candidate-age').text(data[i].age);
-        candidateTemplate.find('.candidate-post').text(data[i].post);
-      
-        candidateTemplate.find('.btn-vote').attr('data-id', data[i].id);
+        content2.find('.panel-title').text(data[i].name);
 
-        content1.append(candidateTemplate.html());
+        content2.find('.candidate-name').text(data[i].name);
+        content2.find('img').attr('src', data[i].picture);
+        
+        content2.find('.candidate-age').text(data[i].age);
+        content2.find('.candidate-post').text(data[i].post);
+      
+        content2.find('.btn-vote').attr('data-id', data[i].id);
+
+        //myModal.find('.modal-title').text(data[i].name);
+        //myModal.find('.cName').text(data[i].name) ;       
+
+       content.append(content2.html());
       }
     });
-
+    return await App.initWeb3();   
     
   },
+  
+  //initWeb3: function(){
+    //window.addEventListener('load', async()=> {
+   initWeb3: async ()=> {
+     if(window.ethereum){
 
-  window:addEventListener('load', async()=> {
-    /*if (typeof web3!= 'undefined'){
-
-      App.web3Provider = web3.currentProvider;
-    
-      web3 = new Web3(web3.currentProvider);
-  } else{
-    App.web3Provider = new Web3.providers.HttpProvider('http"//localhost:7545');
-    web3 =  new Web3(App.web3Provider);}
-    return App.initContract*/
-
-    if (window.ethereum){
-      window.web3 = new Web3(ethereum);
+      App.web3Provider = window.ethereum;
       try{
-        //Request account access
         await window.ethereum.enable();
-        //Accounts now exposed
-        web3.eth.sendTransaction({/*...*/});
-         }
-        catch (error){
-          //User denied account access...
-          console.error("User denied account access")
-        }
-    }
-    //Legacy dapp browsers...
-    else if (window.web3){
-      window.web3 = new Web3(web3.currentProvider);
-      //Accounts always exposed
-      web3.eth.sendTransaction({/*...*/});
-    }
-    //Non-dapp browsers...
-    else{
-      console.log('Non-Ethereum browser detected. You should consider trying Metamask')
-    }
+      }catch(error){
+        console.error ("User denied account access")
+      }
+     }
+     else if (window.web3){
+       App.web3Provider = window.web3.currentProvider;
+     }
+     else{
+       App.web3Provider = new Web3.providers.HttpProvider('http://127.0.1:7545');
+     }
+     web3 = new Web3(App.web3Provider);
 
-  }),
-  /*
-    //if no injected web3 instance is detected, fall back to Ganache
-    else{
-      App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
-    }
-    web3 = new web3(App.web3Provider);
-    return App.initContract();
-  },*/
+ 
+//    if (typeof web3!= 'undefined'){
 
-  initContract: function() {
-    $.getJSON("Election.json", function(election){
-      App.contracts.Election = TruffleContract(election);
+//      App.web3Provider = web3.currentProvider;
+   
+//      web3 = new Web3(web3.currentProvider);
+//  } else{
+//    App.web3Provider = new Web3.providers.HttpProvider('http://127.0.1:7545');
+//    web3 =  new Web3(App.web3Provider);
+//   }
+//    return App.initContract();
+ },
+
+  initContract: ()=> {
+    $.getJSON("Election.json", (data) => {
+      let ElectionArtifact = data;
+
+      App.contracts.Election = TruffleContract(ElectionArtifact);
       
-      App.contracts.Adoption.setProvider(App.web3Provider);
+      App.contracts.Election.setProvider(App.web3Provider);
+      
+      return App.render();
+    });
     
     
-    //App.listenForEvents();
-    return App.render();
-    
-  });
-  return App.bindEvents();
+    return App.bindEvents();
+    //return App.render();  
   },
 
-  bindEvents: function() {
+  bindEvents: () => {
     $(document).on('click', '.btn-vote', App.castVote);
   },
 
-  render: function(voters, account) {
-    var voterInstance;
+    castVote :  (e) => {
+       
+        e.preventDefault();
+    
+        let candidateId = parseInt($(event.target).data('id'));
+
+        //disable button during process
+        $(this).text('Processing..').attr('disabled', true);
+    
+        web3.eth.getAccounts((accounts,error) => {
+          if(error){
+            console.log(error); 
+          }
+          let account= accounts[0];
+    
+          App.contracts.Election.deployed().then((instance) =>{
+            
+            electionInstance= instance;
+            
+            return electionInstance.vote(candidateId, {from: account});
+          })
+          .then( result=> { 
+            alert('Voting Successful!');        
+            
+            document.querySelector('#content').attr('disable', true)
+            document.querySelector('#loader').attr('disable', false)
+            //$("#content1").hide();
+            //$("#loader").show();
+            return App.render();
+
+          }).catch((err)=>{
+            //enable button again on error
+            $(this).text('vote').removeAttr('disabled');
+            console.log(err.message);
+         });     
+     });
+    },
+
+  render: (voters, accounts)=> {
+    var electionInstance;
 
     var loader=$("#loader");
-    var content = $("#content1");
-    var table =  $(".table")
+    var content = $("#content");    
+    var content1 = $("#content1"); 
 
     loader.show();
-    content.hide();
-    
+    content.hide();    
 
     //load account data
     web3.eth.getCoinbase(function(err, account){
@@ -107,67 +143,88 @@ App = {
     });
 
     //load Contract data
-    App.contracts.Election.deployed().then(function(instance){
+    App.contracts.Election.deployed().then((instance)=>{
+      
       electionInstance = instance;
 
-      return electionInstance.candidatesCount.call();
-    }).then(function(candidatesCount){
-
-      var candidatesResults = $("#candidatesResults");
+      return electionInstance.candidatesCount.call();      
+             
+    }).then((candidates)=>{     
+      
+      let candidatesResults = $("#candidatesResults");
       candidatesResults.empty();
 
-      for (i< 0; i<=candidatesCount; i++){
-        electionInstance.candidatesCount(i).then(function(candidate){
-          var id = candidate[0];
-          var name = candidate[1];
-          var voteCount = candidate[2];
+      //for (let i < 1; i<=candidatesCount; i++){
+        
+         
+        candidates.forEach((candidate)=> {
+        electionInstance.candidates(i).then(function (candidate){
+      
+        this.id = candidate[0];
+        this.name = candidate[1];
+        this.voteCount = candidate[2];
+        
 
-          if ((voteCount % 5)==0){
-            var candidateTemplate ="<tr><th>" + id +"</th><td>" + name + "</td><td>" + voteCount + "</td></tr>"
-            candidatesResults.append(candidateTemplate);
-          }
-        });
+        
+          const candidatesResults = document.querySelector('#candidatesResults');
+            
+          const row = document.createElement('tr');
 
-      }
+          row.innerHTML =`
+          <td> ${candidate.id}</td>
+          <td> ${candidate.name}</td>
+          <td> ${candidate.voteCount}</td>
+          `;
+          
+          // "<tr><th>" </th><td> + name + </td><td> + voteCount + </td></tr>`
+          candidatesResults.append(row);
+        
+        
+      });
+          
+    });
+        
+        // electionInstance.candidates(i).then(function(candidate){
+          
+        //   this.id = candidate[0];
+        //   this. name = candidate[1];
+        //   this.voteCount = candidate[2];
+
+          
+        //     const candidatesResults = document.querySelector('#candidatesResults');
+             
+        //     const row = document.createElement('tr');
+
+        //     row.innerHTML =`
+        //     <td> ${candidate.id}</td>
+        //     <td> ${candidate.name}</td>
+        //     <td> ${candidate.voteCount}</td>
+        //     `;
+            
+        //    // "<tr><th>" </th><td> + name + </td><td> + voteCount + </td></tr>`
+        //     candidatesResults.append(row);
+          
+          
+        // });
+
+      },
+      function (err){
+        console.log(err);
+      
       return electionInstance.voters(App.account);
-    }).then(function(Completed){
+    }).then((Completed)=>{
 
       if(Completed){
-      table.show();
+      content.hide();
     }
       loader.hide();
-      content.show();
+      $('content1').show();
     }).catch(function(error){
       console.warn(error);
     });
   },
-  
+ };
 
-
-  castVote: function(event) {
-    event.preventDefault();
-
-    var candidateId = parseInt($(event.target).data('id'));
-
-    web3.eth.getAccounts(function(error,accounts){
-      if(error){
-        console.log(error);
-      }
-      var account= accounts[0];
-
-      App.contracts.Election.deployed().then(function(instance){
-        electionInstance= instance;
-        
-        return electionInstance.vote(candidateId, {from: account});
-      }).then(function(result){
-        return App.render();
-      }).catch(function(err){
-        console.log(err.message);
-      });
-    });
-  }
-
-};
 
 $(function() {
   $(window).load(function() {

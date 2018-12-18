@@ -3,14 +3,16 @@
     "id": 0,
     "name": "Akindipe Olusegun",
     "picture": "images/fergie.jpg",
-    "age": 43
+    "Post": "President",
+    "age": 33
    
   },
   {
     "id": 1,
-    "name": "Akindipe Olusegun",
+    "name": "Donald Trump",
     "picture": "images/fergie.jpg",
-    "age": 43
+    "Post": "Governor",
+    "age": 68
   }
   
 ]
